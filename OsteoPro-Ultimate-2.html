@@ -1,0 +1,2351 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OstéoPro Ultimate - Tests Intégrés</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+            background: linear-gradient(135deg, #0a0a14 0%, #16213e 100%);
+            background-attachment: fixed;
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container { max-width: 800px; margin: 0 auto; }
+        
+        h1 {
+            text-align: center;
+            font-size: clamp(32px, 8vw, 56px);
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff 0%, #e94560 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #7c8db5;
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+        
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.3s; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .btn-main {
+            background: #16213e;
+            border: 2px solid #e94560;
+            color: white;
+            padding: 30px 20px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        
+        .btn-main:active {
+            transform: scale(0.95);
+            background: #e94560;
+        }
+        
+        .icon { font-size: 40px; display: block; margin-bottom: 10px; }
+        
+        .btn-back {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            border: none;
+        }
+        
+        .form-section {
+            background: #16213e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .form-section h2 {
+            color: #e94560;
+            font-size: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .form-group { margin-bottom: 18px; }
+        
+        label {
+            display: block;
+            color: #7c8db5;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #e94560;
+            background: rgba(255,255,255,0.12);
+        }
+        
+        textarea { min-height: 80px; resize: vertical; }
+        
+        /* TESTS SPÉCIFIQUES */
+        .tests-toggle {
+            background: rgba(6, 214, 160, 0.15);
+            border: 1px solid rgba(6, 214, 160, 0.3);
+            color: #06d6a0;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            width: 100%;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .tests-toggle:hover {
+            background: rgba(6, 214, 160, 0.25);
+        }
+        
+        .tests-panel {
+            display: none;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 12px;
+        }
+        
+        .tests-panel.open {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                max-height: 0;
+            }
+            to {
+                opacity: 1;
+                max-height: 500px;
+            }
+        }
+        
+        .test-item {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid #06d6a0;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .test-item:hover {
+            background: rgba(6, 214, 160, 0.1);
+            transform: translateX(4px);
+        }
+        
+        .test-item strong {
+            color: #06d6a0;
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        
+        .test-item span {
+            color: #b8c1ec;
+            font-size: 12px;
+        }
+        
+        /* EVA SLIDER */
+        .eva-container {
+            background: rgba(255,255,255,0.05);
+            padding: 24px;
+            border-radius: 12px;
+            margin-top: 12px;
+        }
+        
+        .eva-display {
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: #e94560;
+            margin-bottom: 20px;
+        }
+        
+        .eva-slider-container {
+            position: relative;
+            height: 60px;
+        }
+        
+        .eva-scale {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 0 10px;
+        }
+        
+        .eva-scale span {
+            font-size: 12px;
+            color: #7c8db5;
+            width: 30px;
+            text-align: center;
+        }
+        
+        .eva-slider {
+            width: 100%;
+            height: 12px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, 
+                #06d6a0 0%, 
+                #ffd166 25%, 
+                #ef476f 50%,
+                #e94560 75%,
+                #8b0000 100%);
+            outline: none;
+            -webkit-appearance: none;
+            position: relative;
+        }
+        
+        .eva-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: 4px solid #e94560;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .eva-slider::-moz-range-thumb {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            border: 4px solid #e94560;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .eva-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+            padding: 0 10px;
+        }
+        
+        .eva-labels span {
+            font-size: 11px;
+            color: #7c8db5;
+            text-align: center;
+        }
+        
+        /* PLAINTES MULTIPLES */
+        .plainte-item {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        
+        .plainte-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .plainte-title {
+            color: #e94560;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .btn-remove {
+            background: rgba(233, 69, 96, 0.2);
+            border: 1px solid #e94560;
+            color: #e94560;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .btn-add {
+            background: rgba(6, 214, 160, 0.2);
+            border: 1px solid #06d6a0;
+            color: #06d6a0;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 12px;
+        }
+        
+        /* HISTORIQUE TRAITEMENTS */
+        .traitement-item {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid #06d6a0;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .traitement-date {
+            color: #06d6a0;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+        
+        .traitement-content {
+            color: #b8c1ec;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 10px;
+        }
+        
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+        }
+        
+        .checkbox-item label {
+            margin: 0;
+            text-transform: none;
+            letter-spacing: normal;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .btn-save {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #e94560, #ff6b81);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .btn-save:active { transform: scale(0.98); }
+        
+        .bilan-card {
+            background: #16213e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid #e94560;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        
+        .bilan-card:active {
+            transform: translateX(4px);
+            border-left-width: 8px;
+        }
+        
+        .bilan-card h3 {
+            color: #e94560;
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+        
+        .bilan-meta {
+            color: #7c8db5;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        
+        .bilan-preview {
+            color: #b8c1ec;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+        
+        .btn-small {
+            padding: 10px 18px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .btn-danger {
+            background: rgba(233, 69, 96, 0.2);
+            border-color: #e94560;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 20px;
+            color: #7c8db5;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .detail-section {
+            background: #16213e;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-section h3 {
+            color: #e94560;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .detail-field {
+            margin-bottom: 12px;
+        }
+        
+        .detail-label {
+            color: #7c8db5;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        
+        .detail-value {
+            color: white;
+            font-size: 16px;
+        }
+        
+        .plaintes-list {
+            margin-top: 12px;
+        }
+        
+        .plainte-detail {
+            background: rgba(255,255,255,0.05);
+            border-left: 3px solid #e94560;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 6px;
+        }
+        
+        .plainte-detail strong {
+            color: #e94560;
+            display: block;
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ÉCRAN ACCUEIL -->
+        <div id="screenHome" class="screen active">
+            <h1>OstéoPro</h1>
+            <p class="subtitle">Version Ultimate avec Tests Intégrés</p>
+            
+            <div class="btn-grid">
+                <button class="btn-main" id="btnNewBilan">
+                    <span class="icon">➕</span>
+                    Nouveau Bilan
+                </button>
+                <button class="btn-main" id="btnListBilans">
+                    <span class="icon">📁</span>
+                    Mes Bilans
+                </button>
+                <button class="btn-main" id="btnStats">
+                    <span class="icon">📊</span>
+                    Statistiques
+                </button>
+                <button class="btn-main" id="btnExport">
+                    <span class="icon">💾</span>
+                    Exporter
+                </button>
+            </div>
+            
+            <div id="recentBilansHome"></div>
+        </div>
+        
+        <!-- ÉCRAN FORMULAIRE -->
+        <div id="screenForm" class="screen">
+            <button class="btn-back" id="btnBackFromForm">← Retour</button>
+            
+            <!-- 1. État Civil -->
+            <div class="form-section">
+                <h2>1. État Civil</h2>
+                
+                <div class="form-group">
+                    <label>Nom et Prénom *</label>
+                    <input type="text" id="inputNom" placeholder="Ex: Jean Dupont">
+                </div>
+                
+                <div class="form-group">
+                    <label>Date de naissance / Âge</label>
+                    <input type="text" id="inputDateNaissance" placeholder="01/01/1985 ou 38 ans">
+                </div>
+                
+                <div class="form-group">
+                    <label>Profession</label>
+                    <input type="text" id="inputProfession" placeholder="Ex: Informaticien">
+                </div>
+                
+                <div class="form-group">
+                    <label>Sport(s) pratiqué(s)</label>
+                    <input type="text" id="inputSport" placeholder="Ex: Tennis 2x/sem, Course à pied">
+                </div>
+                
+                <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="tel" id="inputTel" placeholder="06 12 34 56 78">
+                </div>
+            </div>
+            
+            <!-- 2. Histoire Personnelle et Mode de Vie -->
+            <div class="form-section">
+                <h2>2. Histoire Personnelle et Mode de Vie</h2>
+                
+                <div class="form-group">
+                    <label>Environnement familial, social et émotionnel</label>
+                    <textarea id="inputHistoirePerso" placeholder="Situation familiale, contexte social, événements émotionnels marquants..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Activité professionnelle et ergonomie</label>
+                    <textarea id="inputErgonomie" placeholder="Posture au travail, position assise prolongée, port de charges, gestes répétitifs..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Niveau de stress</label>
+                    <select id="inputStress">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="Faible">Faible</option>
+                        <option value="Modéré">Modéré</option>
+                        <option value="Élevé">Élevé</option>
+                        <option value="Très élevé">Très élevé</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Sources de stress identifiées</label>
+                    <textarea id="inputSourcesStress" placeholder="Professionnel, familial, financier..."></textarea>
+                </div>
+            </div>
+            
+            <!-- 3. Plaintes Multiples avec EVA -->
+            <div class="form-section">
+                <h2>3. Plaintes / Motifs de Consultation</h2>
+                
+                <div id="plaintesContainer"></div>
+                
+                <button class="btn-add" id="btnAddPlainte">➕ Ajouter une plainte</button>
+            </div>
+            
+            <!-- 4. Antécédents -->
+            <div class="form-section">
+                <h2>4. Antécédents</h2>
+                
+                <div class="form-group">
+                    <label>Pathologies connues</label>
+                    <textarea id="inputPathologies" placeholder="Maladies, troubles..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Antécédents traumatiques</label>
+                    <textarea id="inputTraumatiques" placeholder="Accidents, chutes..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Antécédents chirurgicaux</label>
+                    <textarea id="inputChirurgicaux" placeholder="Opérations, interventions chirurgicales (date et type)..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Médicaments en cours</label>
+                    <textarea id="inputMedicaments" placeholder="Liste des médicaments..."></textarea>
+                </div>
+            </div>
+            
+            <!-- 5. Plaintes par Systèmes -->
+            <div class="form-section">
+                <h2>5. Plaintes par Systèmes</h2>
+                
+                <div style="background: rgba(138, 43, 226, 0.08); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                    
+                    <div class="form-group">
+                        <label style="color: #a78bfa;">🧠 Sphère Céphalique et ORL</label>
+                        <textarea id="inputSystemeCephalique" placeholder="Maux de tête, migraines, céphalées, vertiges, acouphènes, troubles ORL, sinusites, problèmes visuels, problèmes dentaires..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #ef476f;">❤️ Système Cardio-Vasculaire</label>
+                        <textarea id="inputSystemeCardio" placeholder="Palpitations, douleurs thoraciques, essoufflement, troubles circulatoires, varices, œdèmes..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #06d6a0;">🫁 Système Respiratoire</label>
+                        <textarea id="inputSystemeRespiratoire" placeholder="Dyspnée, asthme, toux chronique, oppression thoracique, troubles respiratoires..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #ffd166;">🍽️ Système Digestif</label>
+                        <textarea id="inputSystemeDigestif" placeholder="Douleurs abdominales, ballonnements, reflux, nausées, troubles digestifs, sensations de lourdeur..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #ff9f1c;">💩 Transit Intestinal</label>
+                        <textarea id="inputSystemeTransit" placeholder="Constipation, diarrhée, alternance, troubles du transit, côlon irritable..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #e94560;">🩺 Système Uro-Génital</label>
+                        <textarea id="inputSystemeUro" placeholder="Troubles urinaires, incontinence, infections urinaires, douleurs pelviennes, troubles mictionnels..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #ff6b9d;">🌸 Sphère Gynécologique</label>
+                        <textarea id="inputSystemeGyneco" placeholder="Troubles menstruels, dysménorrhée, syndrome prémenstruel, troubles de la fertilité, ménopause, douleurs pelviennes..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #b392ac;">😴 Troubles du Sommeil</label>
+                        <textarea id="inputSystemeSommeil" placeholder="Insomnies, réveils nocturnes, sommeil non réparateur, apnées du sommeil, fatigue chronique..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #ffc6ff;">🧘 Troubles Psycho-Émotionnels</label>
+                        <textarea id="inputSystemePsycho" placeholder="Stress, anxiété, état dépressif, troubles de l'humeur, irritabilité, burn-out..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #8ecae6;">⚡ Troubles Neurologiques</label>
+                        <textarea id="inputSystemeNeuro" placeholder="Paresthésies, engourdissements, fourmillements, troubles de l'équilibre, troubles de la coordination..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #219ebc;">🩸 Troubles Vasculaires et Lymphatiques</label>
+                        <textarea id="inputSystemeVasculaire" placeholder="Jambes lourdes, œdèmes, troubles circulatoires, rétention d'eau, lymphœdème..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label style="color: #8d99ae;">🌡️ Autres Troubles</label>
+                        <textarea id="inputSystemeAutres" placeholder="Troubles endocriniens, dermatologiques, allergies, faiblesse immunitaire, autres plaintes..."></textarea>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <!-- 6. Observation Posturale et Inspection -->
+            <div class="form-section">
+                <h2>6. Observation Posturale et Inspection</h2>
+                
+                <div style="background: rgba(255, 215, 0, 0.1); padding: 16px; border-radius: 10px; margin-bottom: 15px;">
+                    <h3 style="color: #ffd166; font-size: 16px; margin-bottom: 12px;">👁️ Observation Globale</h3>
+                    
+                    <div class="form-group">
+                        <label>Posture Générale</label>
+                        <textarea id="inputPostureGenerale" placeholder="Observation en position debout, assise, allongée..."></textarea>
+                        <button class="tests-toggle" onclick="toggleTests('testsPosture')">
+                            🔍 Points d'observation posturale
+                            <span>▼</span>
+                        </button>
+                        <div id="testsPosture" class="tests-panel">
+                            <div class="test-item" onclick="addTest('inputPostureGenerale', 'Position debout : ')">
+                                <strong>Position debout</strong>
+                                <span>Alignement général, appuis plantaires</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputPostureGenerale', 'Position assise : ')">
+                                <strong>Position assise</strong>
+                                <span>Bascule bassin, courbures rachidiennes</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputPostureGenerale', 'Position allongée : ')">
+                                <strong>Position allongée</strong>
+                                <span>Décubitus dorsal/ventral</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Troubles Structurels</label>
+                        <textarea id="inputTroublesStructurels" placeholder="Scoliose, hyperlordose, hypercyphose, bascule du bassin..."></textarea>
+                        <button class="tests-toggle" onclick="toggleTests('testsTroubles')">
+                            🔍 Troubles structurels courants
+                            <span>▼</span>
+                        </button>
+                        <div id="testsTroubles" class="tests-panel">
+                            <div class="test-item" onclick="addTest('inputTroublesStructurels', 'Scoliose : ')">
+                                <strong>Scoliose</strong>
+                                <span>Déviation latérale du rachis</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputTroublesStructurels', 'Hyperlordose lombaire : ')">
+                                <strong>Hyperlordose lombaire</strong>
+                                <span>Courbure lombaire accentuée</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputTroublesStructurels', 'Hypercyphose thoracique : ')">
+                                <strong>Hypercyphose thoracique</strong>
+                                <span>Courbure dorsale accentuée (dos rond)</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputTroublesStructurels', 'Bascule du bassin : ')">
+                                <strong>Bascule du bassin</strong>
+                                <span>Antéversion/rétroversion</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputTroublesStructurels', 'Attitude scoliotique : ')">
+                                <strong>Attitude scoliotique</strong>
+                                <span>Déviation fonctionnelle réductible</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Analyse de la Marche (Gait Analysis)</label>
+                        <textarea id="inputMarche" placeholder="Démarche, boiterie, déroulé du pas, amplitude, compensations..."></textarea>
+                        <button class="tests-toggle" onclick="toggleTests('testsMarche')">
+                            🔍 Points d'analyse de la marche
+                            <span>▼</span>
+                        </button>
+                        <div id="testsMarche" class="tests-panel">
+                            <div class="test-item" onclick="addTest('inputMarche', 'Attaque du talon : ')">
+                                <strong>Attaque du talon</strong>
+                                <span>Phase d\'appui initial</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputMarche', 'Déroulé du pas : ')">
+                                <strong>Déroulé du pas</strong>
+                                <span>Talon-plante-orteils</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputMarche', 'Phase oscillante : ')">
+                                <strong>Phase oscillante</strong>
+                                <span>Balancement du membre</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputMarche', 'Boiterie : ')">
+                                <strong>Boiterie</strong>
+                                <span>Esquive douloureuse, compensation</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputMarche', 'Amplitude articulaire : ')">
+                                <strong>Amplitude articulaire</strong>
+                                <span>Hanche, genou, cheville</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputMarche', 'Balancement des bras : ')">
+                                <strong>Balancement des bras</strong>
+                                <span>Symétrie, amplitude</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Symétries / Asymétries</label>
+                        <textarea id="inputSymetries" placeholder="Repères osseux : crêtes iliaques, épineuses, omoplates, épaules, triangles de taille..."></textarea>
+                        <button class="tests-toggle" onclick="toggleTests('testsSymetries')">
+                            🔍 Repères anatomiques à comparer
+                            <span>▼</span>
+                        </button>
+                        <div id="testsSymetries" class="tests-panel">
+                            <div class="test-item" onclick="addTest('inputSymetries', 'Crêtes iliaques : ')">
+                                <strong>Crêtes iliaques</strong>
+                                <span>Hauteur D/G</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputSymetries', 'EIPS (Épines iliaques postéro-supérieures) : ')">
+                                <strong>EIPS</strong>
+                                <span>Position D/G</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputSymetries', 'Épineuses vertébrales : ')">
+                                <strong>Épineuses vertébrales</strong>
+                                <span>Alignement, rotation</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputSymetries', 'Omoplates : ')">
+                                <strong>Omoplates</strong>
+                                <span>Hauteur, écartement D/G</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputSymetries', 'Épaules : ')">
+                                <strong>Épaules</strong>
+                                <span>Hauteur, enroulement D/G</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputSymetries', 'Triangles de taille : ')">
+                                <strong>Triangles de taille</strong>
+                                <span>Espace bras-tronc D/G</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputSymetries', 'Plis sous-fessiers : ')">
+                                <strong>Plis sous-fessiers</strong>
+                                <span>Hauteur D/G</span>
+                            </div>
+                            <div class="test-item" onclick="addTest('inputSymetries', 'Longueur des membres : ')">
+                                <strong>Longueur membres</strong>
+                                <span>Inégalité apparente/réelle</span>
+                            </div>
+                </div>
+            </div>
+            
+            <!-- 7. Bilan Ostéo-Articulaire avec Tests -->
+            <div class="form-section">
+                <h2>7. Bilan Ostéo-Articulaire par Région</h2>
+                
+                <button class="guide-toggle" onclick="toggleGuide()" style="background: linear-gradient(135deg, rgba(138, 43, 226, 0.3), rgba(138, 43, 226, 0.15)); border: 2px solid rgba(138, 43, 226, 0.5); color: #a78bfa; padding: 16px 20px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 20px; width: 100%; text-align: left; display: flex; justify-content: space-between; align-items: center;">
+                    📚 GUIDE DES LÉSIONS COURANTES (Cochez pour ajouter)
+                    <span id="guideArrow">▼</span>
+                </button>
+                
+                <div id="guidePanel" class="guide-panel" style="display: none; background: rgba(138, 43, 226, 0.08); border: 1px solid rgba(138, 43, 226, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+                    <div style="color: #a78bfa; line-height: 1.8; font-size: 13px;">
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: #a78bfa; font-size: 16px; margin-bottom: 12px;">🦵 PIEDS</h3>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Pieds', 'Talus antérieur')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Talus antérieur (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Pieds', 'Talus postérieur')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Talus postérieur (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Pieds', 'Calcanéum interne')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Calcanéum interne (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Pieds', 'Calcanéum externe')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Calcanéum externe (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Pieds', 'Cuboïde descendu')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Cuboïde descendu (D/G)</span></label>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: #a78bfa; font-size: 16px; margin-bottom: 12px;">🦵 CHEVILLES</h3>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Chevilles', 'Fibula antérieure')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Fibula antérieure (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Chevilles', 'Fibula postérieure')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Fibula postérieure (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Chevilles', 'Torsion tibio-tarsienne')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Torsion tibio-tarsienne (D/G)</span></label>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: #a78bfa; font-size: 16px; margin-bottom: 12px;">🦵 GENOUX</h3>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Genoux', 'Rotation tibiale interne')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Rotation tibiale interne (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Genoux', 'Rotation tibiale externe')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Rotation tibiale externe (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Genoux', 'Fémur antérieur')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Fémur antérieur (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Genoux', 'Fémur postérieur')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Fémur postérieur (D/G)</span></label>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: #a78bfa; font-size: 16px; margin-bottom: 12px;">🦵 HANCHES</h3>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Hanches', 'Rotation antérieure')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Rotation antérieure (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Hanches', 'Rotation postérieure')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Rotation postérieure (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Hanches', 'Flexion')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Flexion (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Hanches', 'Extension')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Extension (D/G)</span></label>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: #a78bfa; font-size: 16px; margin-bottom: 12px;">🔄 BASSIN</h3>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Bassin', 'Iliaque antérieur')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Iliaque antérieur (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Bassin', 'Iliaque postérieur')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Iliaque postérieur (D/G)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Bassin', 'Sacrum torsion droite')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Sacrum torsion droite</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Bassin', 'Sacrum torsion gauche')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Sacrum torsion gauche</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Bassin', 'Upslip')" style="margin-right: 8px; width: 18px; height: 18px;"><span>Upslip (D/G)</span></label>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <h3 style="color: #a78bfa; font-size: 16px; margin-bottom: 12px;">🔄 LOMBAIRES</h3>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Lombaires', 'FRS')" style="margin-right: 8px; width: 18px; height: 18px;"><span>FRS (préciser niveau)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Lombaires', 'ERS')" style="margin-right: 8px; width: 18px; height: 18px;"><span>ERS (préciser niveau)</span></label>
+                            <label style="display: flex; align-items: center; padding: 6px; cursor: pointer; margin: 4px 0;"><input type="checkbox" onchange="updateLesions(this, 'Lombaires', 'NSR Type I')" style="margin-right: 8px; width: 18px; height: 18px;"><span>NSR Type I</span></label>
+                        </div>
+                        
+                        <p style="color: #7c8db5; font-size: 12px; margin-top: 20px; font-style: italic;">💡 Cochez une lésion pour l'ajouter automatiquement au champ "Finding Lésions" de la région correspondante</p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(6, 214, 160, 0.08); border: 2px solid rgba(6, 214, 160, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #06d6a0; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🦵 Pieds</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobilitePieds" placeholder="Mobilité 1ère MTP, voûte plantaire, flexion/extension..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsPieds" placeholder="Sélectionnez dans le guide ci-dessus ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(6, 214, 160, 0.08); border: 2px solid rgba(6, 214, 160, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #06d6a0; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🦵 Chevilles</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteChevilles" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsChevilles" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(6, 214, 160, 0.08); border: 2px solid rgba(6, 214, 160, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #06d6a0; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🦵 Genoux</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteGenoux" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsGenoux" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(6, 214, 160, 0.08); border: 2px solid rgba(6, 214, 160, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #06d6a0; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🦵 Hanches</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteHanches" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsHanches" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                </div>
+                </div>
+                
+                <div style="background: rgba(255, 209, 102, 0.08); border: 2px solid rgba(255, 209, 102, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ffd166; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🔄 Bassin</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteBassin" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsBassin" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255, 209, 102, 0.08); border: 2px solid rgba(255, 209, 102, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ffd166; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🔄 Rachis Lombaire (L1-L5)</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteLombaires" placeholder="Flexion/extension, rotation, tests segmentaires L1-L5..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsLombaires" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255, 209, 102, 0.08); border: 2px solid rgba(255, 209, 102, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ffd166; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🔄 Rachis Dorsal (T1-T12)</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteDorsales" placeholder="Rotation, mobilité costale, tests segmentaires T1-T12..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsDorsales" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255, 209, 102, 0.08); border: 2px solid rgba(255, 209, 102, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ffd166; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🔄 Rachis Cervical (C1-C7)</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteCervicales" placeholder="Rotation C1-C2, flexion/extension, tests segmentaires..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsCervicales" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(239, 71, 111, 0.08); border: 2px solid rgba(239, 71, 111, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ef476f; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">💪 Mains et Doigts</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteMains" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsMains" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(239, 71, 111, 0.08); border: 2px solid rgba(239, 71, 111, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ef476f; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">💪 Poignets</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobilitePoignets" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsPoignets" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(239, 71, 111, 0.08); border: 2px solid rgba(239, 71, 111, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ef476f; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">💪 Coudes</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteCoudes" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsCoudes" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(239, 71, 111, 0.08); border: 2px solid rgba(239, 71, 111, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #ef476f; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">💪 Épaules</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteEpaules" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsEpaules" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(167, 139, 250, 0.08); border: 2px solid rgba(167, 139, 250, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #a78bfa; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🧠 Crâne et Sphère Crânienne</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteCrane" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsCrane" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(167, 139, 250, 0.08); border: 2px solid rgba(167, 139, 250, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #a78bfa; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🫁 Thorax et Viscères</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteThorax" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsThorax" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                    </div>
+                
+                <div style="background: rgba(167, 139, 250, 0.08); border: 2px solid rgba(167, 139, 250, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 20px;">
+                        <h3 style="color: #a78bfa; font-size: 18px; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">🫁 Abdomen et Viscères</h3>
+                        
+                        <div class="form-group">
+                            <label style="color: #06d6a0;">🟢 Finding Mobilité</label>
+                            <textarea id="inputMobiliteAbdomen" placeholder="Tests de mobilité, amplitudes..." style="background: rgba(6, 214, 160, 0.08); border-color: rgba(6, 214, 160, 0.3);"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label style="color: #e94560;">🔴 Finding Lésions Ostéopathiques</label>
+                            <textarea id="inputLesionsAbdomen" placeholder="Sélectionnez dans le guide ou tapez directement..." style="background: rgba(233, 69, 96, 0.08); border-color: rgba(233, 69, 96, 0.3);"></textarea>
+                        </div>
+                </div>
+            
+            <!-- 8. Diagnostic -->
+            <div class="form-section">
+                <h2>8. Diagnostic Ostéopathique Global</h2>
+                
+                <div class="form-group">
+                    <label>Dysfonctions principales identifiées</label>
+                    <textarea id="inputDiagnostic" placeholder="Synthèse des dysfonctions..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Lien avec les plaintes</label>
+                    <textarea id="inputLienPlaintes" placeholder="Comment les dysfonctions expliquent les symptômes..."></textarea>
+                </div>
+            </div>
+            
+            <!-- 9. Traitement -->
+            <div class="form-section">
+                <h2>9. Traitement de cette séance</h2>
+                
+                <div class="form-group">
+                    <label>Date du traitement</label>
+                    <input type="date" id="inputDateTraitement">
+                </div>
+                
+                <div class="form-group">
+                    <label>Techniques utilisées</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cbStructurel">
+                            <label for="cbStructurel">Structurel</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cbVisceral">
+                            <label for="cbVisceral">Viscéral</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cbCranien">
+                            <label for="cbCranien">Crânien</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="cbFascial">
+                            <label for="cbFascial">Fascial</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description du traitement</label>
+                    <textarea id="inputTraitement" placeholder="Zones traitées, techniques précises..."></textarea>
+                </div>
+            </div>
+            
+            <!-- 10. Conseils et Suivi -->
+            <div class="form-section">
+                <h2>10. Conseils et Suivi</h2>
+                
+                <div class="form-group">
+                    <label>Conseils donnés</label>
+                    <textarea id="inputConseils" placeholder="Repos, exercices, étirements..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Prochaine consultation</label>
+                    <select id="inputProchaineConsult">
+                        <option value="">-- Sélectionner --</option>
+                        <option value="1 semaine">1 semaine</option>
+                        <option value="2 semaines">2 semaines</option>
+                        <option value="3 semaines">3 semaines</option>
+                        <option value="1 mois">1 mois</option>
+                        <option value="Selon évolution">Selon évolution</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn-save" id="btnSaveBilan" style="flex: 1; min-width: 200px;">💾 Enregistrer le Bilan</button>
+                <button class="btn-save" id="btnExportBilan" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, #06d6a0, #00b894);">📤 Télécharger pour OneDrive</button>
+            </div>
+            
+            <div style="margin-top: 15px;">
+                <input type="file" id="fileImportBilan" accept=".json" style="display: none;" onchange="importBilanFromFile(event)">
+                <button class="btn-save" id="btnImportBilan" style="width: 100%; background: linear-gradient(135deg, #a78bfa, #8b5cf6);">📂 Charger un bilan depuis OneDrive</button>
+            </div>
+        </div>
+        
+        <!-- ÉCRAN LISTE -->
+        <div id="screenList" class="screen">
+            <button class="btn-back" id="btnBackFromList">← Retour</button>
+            <h2 style="margin-bottom: 30px; font-size: 32px;">Mes Bilans</h2>
+            <div id="bilansList"></div>
+        </div>
+        
+        <!-- ÉCRAN DÉTAIL -->
+        <div id="screenDetail" class="screen">
+            <button class="btn-back" id="btnBackFromDetail">← Retour à la liste</button>
+            <div id="bilanDetailContent"></div>
+            
+            <!-- Ajout nouveau traitement -->
+            <div class="form-section" style="margin-top: 30px;">
+                <h2>➕ Ajouter un nouveau traitement</h2>
+                
+                <div class="form-group">
+                    <label>Date du traitement</label>
+                    <input type="date" id="inputNewTraitementDate">
+                </div>
+                
+                <div class="form-group">
+                    <label>Description du traitement</label>
+                    <textarea id="inputNewTraitement" placeholder="Nouveau traitement effectué..."></textarea>
+                </div>
+                
+                <button class="btn-save" id="btnAddTraitement">💾 Ajouter ce traitement</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données
+        let bilans = [];
+        let currentBilanId = null;
+        let plaintesCount = 0;
+        
+        // Init
+        function init() {
+            const saved = localStorage.getItem('osteoproBilansUltimate');
+            if (saved) {
+                try {
+                    bilans = JSON.parse(saved);
+                } catch(e) {
+                    bilans = [];
+                }
+            }
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inputDateTraitement').value = today;
+            
+            updateHomeRecent();
+            attachEventListeners();
+            addPlainte();
+        }
+        
+        // Event listeners
+        function attachEventListeners() {
+            document.getElementById('btnNewBilan').onclick = showFormScreen;
+            document.getElementById('btnListBilans').onclick = showListScreen;
+            document.getElementById('btnStats').onclick = showStatsAlert;
+            document.getElementById('btnExport').onclick = exportAllBilans;
+            
+            document.getElementById('btnBackFromForm').onclick = showHomeScreen;
+            document.getElementById('btnBackFromList').onclick = showHomeScreen;
+            document.getElementById('btnBackFromDetail').onclick = showListScreen;
+            
+            document.getElementById('btnSaveBilan').onclick = saveBilan;
+            document.getElementById('btnExportBilan').onclick = exportBilanToFile;
+            document.getElementById('btnImportBilan').onclick = () => document.getElementById('fileImportBilan').click();
+            document.getElementById('btnAddPlainte').onclick = addPlainte;
+            document.getElementById('btnAddTraitement').onclick = addNewTraitement;
+        }
+        
+        // Toggle tests panel
+        function toggleTests(panelId) {
+            const panel = document.getElementById(panelId);
+            panel.classList.toggle('open');
+        }
+        
+        // Ajouter un test au textarea
+        function addTest(textareaId, testText) {
+            const textarea = document.getElementById(textareaId);
+            const currentValue = textarea.value;
+            
+            if (currentValue && !currentValue.endsWith('\n')) {
+                textarea.value = currentValue + '\n' + testText;
+            } else {
+                textarea.value = currentValue + testText;
+            }
+            
+            textarea.focus();
+            textarea.setSelectionRange(textarea.value.length, textarea.value.length);
+        }
+        
+        // Toggle guide panel
+        function toggleGuide() {
+            const panel = document.getElementById('guidePanel');
+            const arrow = document.getElementById('guideArrow');
+            if (panel.style.display === 'none' || !panel.style.display) {
+                panel.style.display = 'block';
+                arrow.textContent = '▲';
+            } else {
+                panel.style.display = 'none';
+                arrow.textContent = '▼';
+            }
+        }
+        
+        // Update lesions from checkbox
+        function updateLesions(checkbox, region, lesion) {
+            const textareaId = 'inputLesions' + region.replace(/\s+/g, '');
+            const textarea = document.getElementById(textareaId);
+            
+            if (!textarea) return;
+            
+            let currentValue = textarea.value;
+            
+            if (checkbox.checked) {
+                // Ajouter la lésion
+                if (currentValue && !currentValue.endsWith('\n')) {
+                    currentValue += '\n';
+                }
+                currentValue += '• ' + lesion;
+                textarea.value = currentValue;
+            } else {
+                // Retirer la lésion
+                const lines = currentValue.split('\n');
+                const filteredLines = lines.filter(line => !line.includes(lesion));
+                textarea.value = filteredLines.join('\n');
+            }
+        }
+        
+        // Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+        
+        function showHomeScreen() {
+            showScreen('screenHome');
+            updateHomeRecent();
+        }
+        
+        function showFormScreen() {
+            showScreen('screenForm');
+            clearForm();
+            plaintesCount = 0;
+            document.getElementById('plaintesContainer').innerHTML = '';
+            addPlainte();
+        }
+        
+        function showListScreen() {
+            showScreen('screenList');
+            updateBilansList();
+        }
+        
+        function showDetailScreen(id) {
+            currentBilanId = id;
+            showScreen('screenDetail');
+            updateBilanDetail(id);
+        }
+        
+        // Ajouter plainte (version simplifiée du code précédent - même logique)
+        function addPlainte() {
+            plaintesCount++;
+            const container = document.getElementById('plaintesContainer');
+            const plainteId = 'plainte' + plaintesCount;
+            
+            const div = document.createElement('div');
+            div.className = 'plainte-item';
+            div.id = plainteId;
+            
+            if (plaintesCount === 1) {
+                div.innerHTML = `
+                    <div class="plainte-header">
+                        <span class="plainte-title">Plainte Principale - Histoire de la Maladie (HDM)</span>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Motif de consultation *</label>
+                        <input type="text" placeholder="Ex: Douleur lombaire gauche" data-field="motif">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Intensité de la douleur (EVA)</label>
+                        <div class="eva-container">
+                            <div class="eva-display" data-display="eva">5/10</div>
+                            <div class="eva-slider-container">
+                                <div class="eva-scale">
+                                    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+                                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                                </div>
+                                <input type="range" min="0" max="10" value="5" class="eva-slider" data-field="eva" 
+                                       oninput="updateEvaDisplay(this)">
+                                <div class="eva-labels">
+                                    <span>Pas de<br>douleur</span>
+                                    <span>Légère</span>
+                                    <span>Modérée</span>
+                                    <span>Sévère</span>
+                                    <span>Insupportable</span>
+                                </div>
+                </div>
+                    
+                    <div class="form-group">
+                        <label>Date d'apparition</label>
+                        <input type="text" placeholder="Ex: Il y a 2 semaines, le 15 janvier..." data-field="dateApparition">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Circonstances de survenue</label>
+                        <textarea placeholder="Comment est apparue la douleur ? (effort, mouvement, accident...)" data-field="circonstances"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Évolution / Fréquence</label>
+                        <textarea placeholder="Comment évolue la douleur ? Permanente, par crises..." data-field="evolution"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Facteurs aggravants</label>
+                        <textarea placeholder="Ce qui empire la douleur (position, mouvement, moment de la journée...)" data-field="aggravants"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Facteurs améliorants</label>
+                        <textarea placeholder="Ce qui soulage (repos, chaleur, mouvement...)" data-field="ameliorants"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Localisation précise</label>
+                        <input type="text" placeholder="Zone anatomique précise" data-field="localisation">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Type de douleur</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cbMecanique1" data-field="mecanique">
+                                <label for="cbMecanique1">Mécanique</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cbInflammatoire1" data-field="inflammatoire">
+                                <label for="cbInflammatoire1">Inflammatoire</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cbMixte1" data-field="mixte">
+                                <label for="cbMixte1">Mixte</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cbAigue1" data-field="aigue">
+                                <label for="cbAigue1">Aiguë</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="cbChronique1" data-field="chronique">
+                                <label for="cbChronique1">Chronique</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Examens complémentaires réalisés</label>
+                        <textarea placeholder="Radio, IRM, scanner, échographie..." data-field="examens"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Traitements déjà effectués</label>
+                        <textarea placeholder="Médicaments, kinésithérapie, ostéopathie antérieure..." data-field="traitementsAnterieurs"></textarea>
+                    </div>
+                `;
+            } else {
+                div.innerHTML = `
+                    <div class="plainte-header">
+                        <span class="plainte-title">Plainte #${plaintesCount - 1}</span>
+                        <button class="btn-remove" onclick="removePlainte('${plainteId}')">✕</button>
+                    </div>
+                    <div class="form-group">
+                        <label>Motif</label>
+                        <input type="text" placeholder="Ex: Cervicalgie" data-field="motif">
+                    </div>
+                    <div class="form-group">
+                        <label>EVA</label>
+                        <div class="eva-container">
+                            <div class="eva-display" data-display="eva">5/10</div>
+                            <div class="eva-slider-container">
+                                <div class="eva-scale">
+                                    <span>0</span><span>1</span><span>2</span><span>3</span><span>4</span>
+                                    <span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
+                                </div>
+                                <input type="range" min="0" max="10" value="5" class="eva-slider" data-field="eva" 
+                                       oninput="updateEvaDisplay(this)">
+                                <div class="eva-labels">
+                                    <span>Aucune</span><span>Légère</span><span>Modérée</span><span>Sévère</span><span>Max</span>
+                                </div>
+                </div>
+                `;
+            }
+            
+            container.appendChild(div);
+        }
+        
+        function updateEvaDisplay(slider) {
+            const value = slider.value;
+            const display = slider.closest('.plainte-item').querySelector('[data-display="eva"]');
+            display.textContent = value + '/10';
+            if (value <= 3) display.style.color = '#06d6a0';
+            else if (value <= 6) display.style.color = '#ffd166';
+            else display.style.color = '#e94560';
+        }
+        
+        function removePlainte(id) {
+            document.getElementById(id).remove();
+        }
+        
+        function getAllPlaintes() {
+            const plaintes = [];
+            document.querySelectorAll('.plainte-item').forEach((item, index) => {
+                const motif = item.querySelector('[data-field="motif"]').value;
+                if (motif.trim()) {
+                    const plainte = {
+                        motif: motif,
+                        eva: item.querySelector('[data-field="eva"]').value,
+                        circonstances: item.querySelector('[data-field="circonstances"]') ? 
+                            item.querySelector('[data-field="circonstances"]').value : '',
+                        dateApparition: item.querySelector('[data-field="dateApparition"]') ? 
+                            item.querySelector('[data-field="dateApparition"]').value : ''
+                    };
+                    
+                    // Si c'est la première plainte, récupérer tous les champs HDM
+                    if (index === 0) {
+                        plainte.evolution = item.querySelector('[data-field="evolution"]') ? 
+                            item.querySelector('[data-field="evolution"]').value : '';
+                        plainte.aggravants = item.querySelector('[data-field="aggravants"]') ? 
+                            item.querySelector('[data-field="aggravants"]').value : '';
+                        plainte.ameliorants = item.querySelector('[data-field="ameliorants"]') ? 
+                            item.querySelector('[data-field="ameliorants"]').value : '';
+                        plainte.localisation = item.querySelector('[data-field="localisation"]') ? 
+                            item.querySelector('[data-field="localisation"]').value : '';
+                        plainte.examens = item.querySelector('[data-field="examens"]') ? 
+                            item.querySelector('[data-field="examens"]').value : '';
+                        plainte.traitementsAnterieurs = item.querySelector('[data-field="traitementsAnterieurs"]') ? 
+                            item.querySelector('[data-field="traitementsAnterieurs"]').value : '';
+                        
+                        // Type de douleur
+                        plainte.typeDouleur = {
+                            mecanique: item.querySelector('[data-field="mecanique"]') ? 
+                                item.querySelector('[data-field="mecanique"]').checked : false,
+                            inflammatoire: item.querySelector('[data-field="inflammatoire"]') ? 
+                                item.querySelector('[data-field="inflammatoire"]').checked : false,
+                            mixte: item.querySelector('[data-field="mixte"]') ? 
+                                item.querySelector('[data-field="mixte"]').checked : false,
+                            aigue: item.querySelector('[data-field="aigue"]') ? 
+                                item.querySelector('[data-field="aigue"]').checked : false,
+                            chronique: item.querySelector('[data-field="chronique"]') ? 
+                                item.querySelector('[data-field="chronique"]').checked : false
+                        };
+                    }
+                    
+                    plaintes.push(plainte);
+                }
+            });
+            return plaintes;
+        }
+        
+        // Sauvegarder
+        function saveBilan() {
+            const nom = document.getElementById('inputNom').value.trim();
+            const plaintes = getAllPlaintes();
+            
+            if (!nom || plaintes.length === 0) {
+                alert('⚠️ Nom et au moins une plainte requis');
+                return;
+            }
+            
+            const techniques = [];
+            if (document.getElementById('cbStructurel').checked) techniques.push('Structurel');
+            if (document.getElementById('cbVisceral').checked) techniques.push('Viscéral');
+            if (document.getElementById('cbCranien').checked) techniques.push('Crânien');
+            if (document.getElementById('cbFascial').checked) techniques.push('Fascial');
+            
+            const bilan = {
+                id: Date.now(),
+                dateCreation: new Date().toISOString(),
+                nom: nom,
+                dateNaissance: document.getElementById('inputDateNaissance').value,
+                profession: document.getElementById('inputProfession').value,
+                sport: document.getElementById('inputSport').value,
+                tel: document.getElementById('inputTel').value,
+                
+                // Histoire personnelle et mode de vie
+                histoirePerso: document.getElementById('inputHistoirePerso').value,
+                ergonomie: document.getElementById('inputErgonomie').value,
+                stress: document.getElementById('inputStress').value,
+                sourcesStress: document.getElementById('inputSourcesStress').value,
+                
+                // Observation posturale
+                postureGenerale: document.getElementById('inputPostureGenerale').value,
+                troublesStructurels: document.getElementById('inputTroublesStructurels').value,
+                marche: document.getElementById('inputMarche').value,
+                symetries: document.getElementById('inputSymetries').value,
+                
+                plaintes: plaintes,
+                pathologies: document.getElementById('inputPathologies').value,
+                traumatiques: document.getElementById('inputTraumatiques').value,
+                chirurgicaux: document.getElementById('inputChirurgicaux').value,
+                medicaments: document.getElementById('inputMedicaments').value,
+                
+                // Plaintes par systèmes
+                systemeCephalique: document.getElementById('inputSystemeCephalique').value,
+                systemeCardio: document.getElementById('inputSystemeCardio').value,
+                systemeRespiratoire: document.getElementById('inputSystemeRespiratoire').value,
+                systemeDigestif: document.getElementById('inputSystemeDigestif').value,
+                systemeTransit: document.getElementById('inputSystemeTransit').value,
+                systemeUro: document.getElementById('inputSystemeUro').value,
+                systemeGyneco: document.getElementById('inputSystemeGyneco').value,
+                systemeSommeil: document.getElementById('inputSystemeSommeil').value,
+                systemePsycho: document.getElementById('inputSystemePsycho').value,
+                systemeNeuro: document.getElementById('inputSystemeNeuro').value,
+                systemeVasculaire: document.getElementById('inputSystemeVasculaire').value,
+                systemeAutres: document.getElementById('inputSystemeAutres').value,
+                
+                bilanOsteo: {
+                    mobilitePieds: document.getElementById('inputMobilitePieds').value,
+                    lesionsPieds: document.getElementById('inputLesionsPieds').value,
+                    mobiliteChevilles: document.getElementById('inputMobiliteChevilles').value,
+                    lesionsChevilles: document.getElementById('inputLesionsChevilles').value,
+                    mobiliteGenoux: document.getElementById('inputMobiliteGenoux').value,
+                    lesionsGenoux: document.getElementById('inputLesionsGenoux').value,
+                    mobiliteHanches: document.getElementById('inputMobiliteHanches').value,
+                    lesionsHanches: document.getElementById('inputLesionsHanches').value,
+                    mobiliteBassin: document.getElementById('inputMobiliteBassin').value,
+                    lesionsBassin: document.getElementById('inputLesionsBassin').value,
+                    mobiliteLombaires: document.getElementById('inputMobiliteLombaires').value,
+                    lesionsLombaires: document.getElementById('inputLesionsLombaires').value,
+                    mobiliteDorsales: document.getElementById('inputMobiliteDorsales').value,
+                    lesionsDorsales: document.getElementById('inputLesionsDorsales').value,
+                    mobiliteCervicales: document.getElementById('inputMobiliteCervicales').value,
+                    lesionsCervicales: document.getElementById('inputLesionsCervicales').value,
+                    mobiliteMains: document.getElementById('inputMobiliteMains').value,
+                    lesionsMains: document.getElementById('inputLesionsMains').value,
+                    mobilitePoignets: document.getElementById('inputMobilitePoignets').value,
+                    lesionsPoignets: document.getElementById('inputLesionsPoignets').value,
+                    mobiliteCoudes: document.getElementById('inputMobiliteCoudes').value,
+                    lesionsCoudes: document.getElementById('inputLesionsCoudes').value,
+                    mobiliteEpaules: document.getElementById('inputMobiliteEpaules').value,
+                    lesionsEpaules: document.getElementById('inputLesionsEpaules').value,
+                    mobiliteCrane: document.getElementById('inputMobiliteCrane').value,
+                    lesionsCrane: document.getElementById('inputLesionsCrane').value,
+                    mobiliteThorax: document.getElementById('inputMobiliteThorax').value,
+                    lesionsThorax: document.getElementById('inputLesionsThorax').value,
+                    mobiliteAbdomen: document.getElementById('inputMobiliteAbdomen').value,
+                    lesionsAbdomen: document.getElementById('inputLesionsAbdomen').value
+                },
+                diagnostic: document.getElementById('inputDiagnostic').value,
+                lienPlaintes: document.getElementById('inputLienPlaintes').value,
+                traitements: [{
+                    date: document.getElementById('inputDateTraitement').value,
+                    techniques: techniques,
+                    description: document.getElementById('inputTraitement').value
+                }],
+                conseils: document.getElementById('inputConseils').value,
+                prochaineConsult: document.getElementById('inputProchaineConsult').value
+            };
+            
+            bilans.unshift(bilan);
+            saveToStorage();
+            alert('✅ Bilan enregistré !');
+            showHomeScreen();
+        }
+        
+        function addNewTraitement() {
+            if (!currentBilanId) return;
+            const date = document.getElementById('inputNewTraitementDate').value;
+            const description = document.getElementById('inputNewTraitement').value.trim();
+            
+            if (!date || !description) {
+                alert('⚠️ Date et description requis');
+                return;
+            }
+            
+            const bilan = bilans.find(b => b.id === currentBilanId);
+            if (bilan) {
+                if (!bilan.traitements) bilan.traitements = [];
+                bilan.traitements.push({ date: date, description: description, techniques: [] });
+                saveToStorage();
+                alert('✅ Traitement ajouté !');
+                document.getElementById('inputNewTraitement').value = '';
+                document.getElementById('inputNewTraitementDate').value = new Date().toISOString().split('T')[0];
+                updateBilanDetail(currentBilanId);
+            }
+        }
+        
+        function saveToStorage() {
+            localStorage.setItem('osteoproBilansUltimate', JSON.stringify(bilans));
+        }
+        
+        // EXPORT BILAN vers fichier JSON (pour OneDrive)
+        function exportBilanToFile() {
+            const nom = document.getElementById('inputNom').value.trim();
+            const plaintes = getAllPlaintes();
+            
+            if (!nom || plaintes.length === 0) {
+                alert('⚠️ Veuillez remplir au moins le nom et une plainte avant d\'exporter');
+                return;
+            }
+            
+            const techniques = [];
+            if (document.getElementById('cbStructurel').checked) techniques.push('Structurel');
+            if (document.getElementById('cbVisceral').checked) techniques.push('Viscéral');
+            if (document.getElementById('cbCranien').checked) techniques.push('Crânien');
+            if (document.getElementById('cbFascial').checked) techniques.push('Fascial');
+            
+            const bilan = {
+                id: Date.now(),
+                dateCreation: new Date().toISOString(),
+                nom: nom,
+                dateNaissance: document.getElementById('inputDateNaissance').value,
+                profession: document.getElementById('inputProfession').value,
+                sport: document.getElementById('inputSport').value,
+                tel: document.getElementById('inputTel').value,
+                
+                histoirePerso: document.getElementById('inputHistoirePerso').value,
+                ergonomie: document.getElementById('inputErgonomie').value,
+                stress: document.getElementById('inputStress').value,
+                sourcesStress: document.getElementById('inputSourcesStress').value,
+                
+                postureGenerale: document.getElementById('inputPostureGenerale').value,
+                troublesStructurels: document.getElementById('inputTroublesStructurels').value,
+                marche: document.getElementById('inputMarche').value,
+                symetries: document.getElementById('inputSymetries').value,
+                
+                plaintes: plaintes,
+                pathologies: document.getElementById('inputPathologies').value,
+                traumatiques: document.getElementById('inputTraumatiques').value,
+                chirurgicaux: document.getElementById('inputChirurgicaux').value,
+                medicaments: document.getElementById('inputMedicaments').value,
+                
+                systemeCephalique: document.getElementById('inputSystemeCephalique').value,
+                systemeCardio: document.getElementById('inputSystemeCardio').value,
+                systemeRespiratoire: document.getElementById('inputSystemeRespiratoire').value,
+                systemeDigestif: document.getElementById('inputSystemeDigestif').value,
+                systemeTransit: document.getElementById('inputSystemeTransit').value,
+                systemeUro: document.getElementById('inputSystemeUro').value,
+                systemeGyneco: document.getElementById('inputSystemeGyneco').value,
+                systemeSommeil: document.getElementById('inputSystemeSommeil').value,
+                systemePsycho: document.getElementById('inputSystemePsycho').value,
+                systemeNeuro: document.getElementById('inputSystemeNeuro').value,
+                systemeVasculaire: document.getElementById('inputSystemeVasculaire').value,
+                systemeAutres: document.getElementById('inputSystemeAutres').value,
+                
+                bilanOsteo: {
+                    mobilitePieds: document.getElementById('inputMobilitePieds').value,
+                    lesionsPieds: document.getElementById('inputLesionsPieds').value,
+                    mobiliteChevilles: document.getElementById('inputMobiliteChevilles').value,
+                    lesionsChevilles: document.getElementById('inputLesionsChevilles').value,
+                    mobiliteGenoux: document.getElementById('inputMobiliteGenoux').value,
+                    lesionsGenoux: document.getElementById('inputLesionsGenoux').value,
+                    mobiliteHanches: document.getElementById('inputMobiliteHanches').value,
+                    lesionsHanches: document.getElementById('inputLesionsHanches').value,
+                    mobiliteBassin: document.getElementById('inputMobiliteBassin').value,
+                    lesionsBassin: document.getElementById('inputLesionsBassin').value,
+                    mobiliteLombaires: document.getElementById('inputMobiliteLombaires').value,
+                    lesionsLombaires: document.getElementById('inputLesionsLombaires').value,
+                    mobiliteDorsales: document.getElementById('inputMobiliteDorsales').value,
+                    lesionsDorsales: document.getElementById('inputLesionsDorsales').value,
+                    mobiliteCervicales: document.getElementById('inputMobiliteCervicales').value,
+                    lesionsCervicales: document.getElementById('inputLesionsCervicales').value,
+                    mobiliteMains: document.getElementById('inputMobiliteMains').value,
+                    lesionsMains: document.getElementById('inputLesionsMains').value,
+                    mobilitePoignets: document.getElementById('inputMobilitePoignets').value,
+                    lesionsPoignets: document.getElementById('inputLesionsPoignets').value,
+                    mobiliteCoudes: document.getElementById('inputMobiliteCoudes').value,
+                    lesionsCoudes: document.getElementById('inputLesionsCoudes').value,
+                    mobiliteEpaules: document.getElementById('inputMobiliteEpaules').value,
+                    lesionsEpaules: document.getElementById('inputLesionsEpaules').value,
+                    mobiliteCrane: document.getElementById('inputMobiliteCrane').value,
+                    lesionsCrane: document.getElementById('inputLesionsCrane').value,
+                    mobiliteThorax: document.getElementById('inputMobiliteThorax').value,
+                    lesionsThorax: document.getElementById('inputLesionsThorax').value,
+                    mobiliteAbdomen: document.getElementById('inputMobiliteAbdomen').value,
+                    lesionsAbdomen: document.getElementById('inputLesionsAbdomen').value
+                },
+                diagnostic: document.getElementById('inputDiagnostic').value,
+                lienPlaintes: document.getElementById('inputLienPlaintes').value,
+                traitements: [{
+                    date: new Date().toISOString().split('T')[0],
+                    techniques: techniques,
+                    description: document.getElementById('inputTraitement').value
+                }],
+                conseils: document.getElementById('inputConseils').value,
+                prochaineConsult: document.getElementById('inputProchaineConsult').value
+            };
+            
+            // Créer le fichier JSON
+            const jsonStr = JSON.stringify(bilan, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            // Créer un nom de fichier avec date et nom patient
+            const date = new Date().toISOString().split('T')[0];
+            const nomFichier = `OsteoPro_${nom.replace(/\s+/g, '_')}_${date}.json`;
+            
+            // Télécharger
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = nomFichier;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`✅ Bilan exporté !\n\n📁 Fichier: ${nomFichier}\n\n💡 Sauvegardez-le sur OneDrive pour le retrouver lors de la prochaine consultation.`);
+        }
+        
+        // IMPORT BILAN depuis fichier JSON (depuis OneDrive)
+        function importBilanFromFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const bilan = JSON.parse(e.target.result);
+                    
+                    // Confirmer l'import
+                    if (!confirm(`📂 Charger le bilan de :\n\n👤 ${bilan.nom}\n📅 ${new Date(bilan.dateCreation).toLocaleDateString('fr-FR')}\n\n✅ Le formulaire sera pré-rempli avec ces données.`)) {
+                        return;
+                    }
+                    
+                    // Remplir le formulaire
+                    fillFormFromBilan(bilan);
+                    
+                    alert('✅ Bilan chargé !\n\nVous pouvez maintenant modifier et ajouter de nouvelles informations.');
+                    
+                } catch (error) {
+                    alert('❌ Erreur lors de la lecture du fichier.\n\nAssurez-vous qu\'il s\'agit bien d\'un fichier OstéoPro exporté.');
+                    console.error(error);
+                }
+            };
+            reader.readAsText(file);
+            
+            // Reset l'input pour pouvoir recharger le même fichier
+            event.target.value = '';
+        }
+        
+        // Remplir le formulaire avec les données d'un bilan
+        function fillFormFromBilan(bilan) {
+            // État civil
+            document.getElementById('inputNom').value = bilan.nom || '';
+            document.getElementById('inputDateNaissance').value = bilan.dateNaissance || '';
+            document.getElementById('inputProfession').value = bilan.profession || '';
+            document.getElementById('inputSport').value = bilan.sport || '';
+            document.getElementById('inputTel').value = bilan.tel || '';
+            
+            // Histoire personnelle
+            document.getElementById('inputHistoirePerso').value = bilan.histoirePerso || '';
+            document.getElementById('inputErgonomie').value = bilan.ergonomie || '';
+            document.getElementById('inputStress').value = bilan.stress || '';
+            document.getElementById('inputSourcesStress').value = bilan.sourcesStress || '';
+            
+            // Observation posturale
+            document.getElementById('inputPostureGenerale').value = bilan.postureGenerale || '';
+            document.getElementById('inputTroublesStructurels').value = bilan.troublesStructurels || '';
+            document.getElementById('inputMarche').value = bilan.marche || '';
+            document.getElementById('inputSymetries').value = bilan.symetries || '';
+            
+            // Plaintes - Recréer les plaintes
+            document.getElementById('plaintesContainer').innerHTML = '';
+            if (bilan.plaintes && bilan.plaintes.length > 0) {
+                bilan.plaintes.forEach((p, index) => {
+                    addPlainte();
+                    const items = document.querySelectorAll('.plainte-item');
+                    const item = items[items.length - 1];
+                    
+                    item.querySelector('[data-field="motif"]').value = p.motif || '';
+                    item.querySelector('[data-field="eva"]').value = p.eva || 5;
+                    updateEvaDisplay(item.querySelector('[data-field="eva"]'));
+                    
+                    if (item.querySelector('[data-field="circonstances"]')) {
+                        item.querySelector('[data-field="circonstances"]').value = p.circonstances || '';
+                    }
+                    if (item.querySelector('[data-field="dateApparition"]')) {
+                        item.querySelector('[data-field="dateApparition"]').value = p.dateApparition || '';
+                    }
+                    
+                    // Champs HDM supplémentaires pour la première plainte
+                    if (index === 0 && p.evolution) {
+                        if (item.querySelector('[data-field="evolution"]')) {
+                            item.querySelector('[data-field="evolution"]').value = p.evolution || '';
+                        }
+                        if (item.querySelector('[data-field="aggravants"]')) {
+                            item.querySelector('[data-field="aggravants"]').value = p.aggravants || '';
+                        }
+                        if (item.querySelector('[data-field="ameliorants"]')) {
+                            item.querySelector('[data-field="ameliorants"]').value = p.ameliorants || '';
+                        }
+                        if (item.querySelector('[data-field="localisation"]')) {
+                            item.querySelector('[data-field="localisation"]').value = p.localisation || '';
+                        }
+                        if (item.querySelector('[data-field="examens"]')) {
+                            item.querySelector('[data-field="examens"]').value = p.examens || '';
+                        }
+                        if (item.querySelector('[data-field="traitementsAnterieurs"]')) {
+                            item.querySelector('[data-field="traitementsAnterieurs"]').value = p.traitementsAnterieurs || '';
+                        }
+                        
+                        // Type de douleur
+                        if (p.typeDouleur) {
+                            if (item.querySelector('[data-field="mecanique"]')) item.querySelector('[data-field="mecanique"]').checked = p.typeDouleur.mecanique || false;
+                            if (item.querySelector('[data-field="inflammatoire"]')) item.querySelector('[data-field="inflammatoire"]').checked = p.typeDouleur.inflammatoire || false;
+                            if (item.querySelector('[data-field="mixte"]')) item.querySelector('[data-field="mixte"]').checked = p.typeDouleur.mixte || false;
+                            if (item.querySelector('[data-field="aigue"]')) item.querySelector('[data-field="aigue"]').checked = p.typeDouleur.aigue || false;
+                            if (item.querySelector('[data-field="chronique"]')) item.querySelector('[data-field="chronique"]').checked = p.typeDouleur.chronique || false;
+                        }
+                    }
+                });
+            } else {
+                addPlainte(); // Au moins une plainte par défaut
+            }
+            
+            // Antécédents
+            document.getElementById('inputPathologies').value = bilan.pathologies || '';
+            document.getElementById('inputTraumatiques').value = bilan.traumatiques || '';
+            document.getElementById('inputChirurgicaux').value = bilan.chirurgicaux || '';
+            document.getElementById('inputMedicaments').value = bilan.medicaments || '';
+            
+            // Plaintes par systèmes
+            document.getElementById('inputSystemeCephalique').value = bilan.systemeCephalique || '';
+            document.getElementById('inputSystemeCardio').value = bilan.systemeCardio || '';
+            document.getElementById('inputSystemeRespiratoire').value = bilan.systemeRespiratoire || '';
+            document.getElementById('inputSystemeDigestif').value = bilan.systemeDigestif || '';
+            document.getElementById('inputSystemeTransit').value = bilan.systemeTransit || '';
+            document.getElementById('inputSystemeUro').value = bilan.systemeUro || '';
+            document.getElementById('inputSystemeGyneco').value = bilan.systemeGyneco || '';
+            document.getElementById('inputSystemeSommeil').value = bilan.systemeSommeil || '';
+            document.getElementById('inputSystemePsycho').value = bilan.systemePsycho || '';
+            document.getElementById('inputSystemeNeuro').value = bilan.systemeNeuro || '';
+            document.getElementById('inputSystemeVasculaire').value = bilan.systemeVasculaire || '';
+            document.getElementById('inputSystemeAutres').value = bilan.systemeAutres || '';
+            
+            // Bilan ostéo
+            if (bilan.bilanOsteo) {
+                document.getElementById('inputMobilitePieds').value = bilan.bilanOsteo.mobilitePieds || '';
+                document.getElementById('inputLesionsPieds').value = bilan.bilanOsteo.lesionsPieds || '';
+                document.getElementById('inputMobiliteChevilles').value = bilan.bilanOsteo.mobiliteChevilles || '';
+                document.getElementById('inputLesionsChevilles').value = bilan.bilanOsteo.lesionsChevilles || '';
+                document.getElementById('inputMobiliteGenoux').value = bilan.bilanOsteo.mobiliteGenoux || '';
+                document.getElementById('inputLesionsGenoux').value = bilan.bilanOsteo.lesionsGenoux || '';
+                document.getElementById('inputMobiliteHanches').value = bilan.bilanOsteo.mobiliteHanches || '';
+                document.getElementById('inputLesionsHanches').value = bilan.bilanOsteo.lesionsHanches || '';
+                document.getElementById('inputMobiliteBassin').value = bilan.bilanOsteo.mobiliteBassin || '';
+                document.getElementById('inputLesionsBassin').value = bilan.bilanOsteo.lesionsBassin || '';
+                document.getElementById('inputMobiliteLombaires').value = bilan.bilanOsteo.mobiliteLombaires || '';
+                document.getElementById('inputLesionsLombaires').value = bilan.bilanOsteo.lesionsLombaires || '';
+                document.getElementById('inputMobiliteDorsales').value = bilan.bilanOsteo.mobiliteDorsales || '';
+                document.getElementById('inputLesionsDorsales').value = bilan.bilanOsteo.lesionsDorsales || '';
+                document.getElementById('inputMobiliteCervicales').value = bilan.bilanOsteo.mobiliteCervicales || '';
+                document.getElementById('inputLesionsCervicales').value = bilan.bilanOsteo.lesionsCervicales || '';
+                document.getElementById('inputMobiliteMains').value = bilan.bilanOsteo.mobiliteMains || '';
+                document.getElementById('inputLesionsMains').value = bilan.bilanOsteo.lesionsMains || '';
+                document.getElementById('inputMobilitePoignets').value = bilan.bilanOsteo.mobilitePoignets || '';
+                document.getElementById('inputLesionsPoignets').value = bilan.bilanOsteo.lesionsPoignets || '';
+                document.getElementById('inputMobiliteCoudes').value = bilan.bilanOsteo.mobiliteCoudes || '';
+                document.getElementById('inputLesionsCoudes').value = bilan.bilanOsteo.lesionsCoudes || '';
+                document.getElementById('inputMobiliteEpaules').value = bilan.bilanOsteo.mobiliteEpaules || '';
+                document.getElementById('inputLesionsEpaules').value = bilan.bilanOsteo.lesionsEpaules || '';
+                document.getElementById('inputMobiliteCrane').value = bilan.bilanOsteo.mobiliteCrane || '';
+                document.getElementById('inputLesionsCrane').value = bilan.bilanOsteo.lesionsCrane || '';
+                document.getElementById('inputMobiliteThorax').value = bilan.bilanOsteo.mobiliteThorax || '';
+                document.getElementById('inputLesionsThorax').value = bilan.bilanOsteo.lesionsThorax || '';
+                document.getElementById('inputMobiliteAbdomen').value = bilan.bilanOsteo.mobiliteAbdomen || '';
+                document.getElementById('inputLesionsAbdomen').value = bilan.bilanOsteo.lesionsAbdomen || '';
+            }
+            
+            // Diagnostic
+            document.getElementById('inputDiagnostic').value = bilan.diagnostic || '';
+            document.getElementById('inputLienPlaintes').value = bilan.lienPlaintes || '';
+            
+            // Traitement - Prendre le dernier traitement
+            if (bilan.traitements && bilan.traitements.length > 0) {
+                const dernierTraitement = bilan.traitements[bilan.traitements.length - 1];
+                document.getElementById('inputTraitement').value = dernierTraitement.description || '';
+                
+                // Cocher les techniques
+                document.getElementById('cbStructurel').checked = dernierTraitement.techniques.includes('Structurel');
+                document.getElementById('cbVisceral').checked = dernierTraitement.techniques.includes('Viscéral');
+                document.getElementById('cbCranien').checked = dernierTraitement.techniques.includes('Crânien');
+                document.getElementById('cbFascial').checked = dernierTraitement.techniques.includes('Fascial');
+            }
+            
+            // Conseils
+            document.getElementById('inputConseils').value = bilan.conseils || '';
+            document.getElementById('inputProchaineConsult').value = bilan.prochaineConsult || '';
+        }
+        
+        
+        function clearForm() {
+            document.getElementById('inputNom').value = '';
+            document.getElementById('inputDateNaissance').value = '';
+            document.getElementById('inputProfession').value = '';
+            document.getElementById('inputSport').value = '';
+            document.getElementById('inputTel').value = '';
+            
+            // Histoire et mode de vie
+            document.getElementById('inputHistoirePerso').value = '';
+            document.getElementById('inputErgonomie').value = '';
+            document.getElementById('inputStress').value = '';
+            document.getElementById('inputSourcesStress').value = '';
+            
+            // Observation posturale
+            document.getElementById('inputPostureGenerale').value = '';
+            document.getElementById('inputTroublesStructurels').value = '';
+            document.getElementById('inputMarche').value = '';
+            document.getElementById('inputSymetries').value = '';
+            
+            document.getElementById('inputPathologies').value = '';
+            document.getElementById('inputTraumatiques').value = '';
+            document.getElementById('inputChirurgicaux').value = '';
+            document.getElementById('inputMedicaments').value = '';
+            
+            // Plaintes par systèmes
+            document.getElementById('inputSystemeCephalique').value = '';
+            document.getElementById('inputSystemeCardio').value = '';
+            document.getElementById('inputSystemeRespiratoire').value = '';
+            document.getElementById('inputSystemeDigestif').value = '';
+            document.getElementById('inputSystemeTransit').value = '';
+            document.getElementById('inputSystemeUro').value = '';
+            document.getElementById('inputSystemeGyneco').value = '';
+            document.getElementById('inputSystemeSommeil').value = '';
+            document.getElementById('inputSystemePsycho').value = '';
+            document.getElementById('inputSystemeNeuro').value = '';
+            document.getElementById('inputSystemeVasculaire').value = '';
+            document.getElementById('inputSystemeAutres').value = '';
+            
+            // Bilan ostéo-articulaire
+            document.getElementById('inputMobilitePieds').value = '';
+            document.getElementById('inputLesionsPieds').value = '';
+            document.getElementById('inputMobiliteChevilles').value = '';
+            document.getElementById('inputLesionsChevilles').value = '';
+            document.getElementById('inputMobiliteGenoux').value = '';
+            document.getElementById('inputLesionsGenoux').value = '';
+            document.getElementById('inputMobiliteHanches').value = '';
+            document.getElementById('inputLesionsHanches').value = '';
+            document.getElementById('inputMobiliteBassin').value = '';
+            document.getElementById('inputLesionsBassin').value = '';
+            document.getElementById('inputMobiliteLombaires').value = '';
+            document.getElementById('inputLesionsLombaires').value = '';
+            document.getElementById('inputMobiliteDorsales').value = '';
+            document.getElementById('inputLesionsDorsales').value = '';
+            document.getElementById('inputMobiliteCervicales').value = '';
+            document.getElementById('inputLesionsCervicales').value = '';
+            document.getElementById('inputMobiliteMains').value = '';
+            document.getElementById('inputLesionsMains').value = '';
+            document.getElementById('inputMobilitePoignets').value = '';
+            document.getElementById('inputLesionsPoignets').value = '';
+            document.getElementById('inputMobiliteCoudes').value = '';
+            document.getElementById('inputLesionsCoudes').value = '';
+            document.getElementById('inputMobiliteEpaules').value = '';
+            document.getElementById('inputLesionsEpaules').value = '';
+            document.getElementById('inputMobiliteCrane').value = '';
+            document.getElementById('inputLesionsCrane').value = '';
+            document.getElementById('inputMobiliteThorax').value = '';
+            document.getElementById('inputLesionsThorax').value = '';
+            document.getElementById('inputMobiliteAbdomen').value = '';
+            document.getElementById('inputLesionsAbdomen').value = '';
+            
+            // Diagnostic
+            document.getElementById('inputDiagnostic').value = '';
+            document.getElementById('inputLienPlaintes').value = '';
+            document.getElementById('inputTraitement').value = '';
+            document.getElementById('inputConseils').value = '';
+            document.getElementById('inputProchaineConsult').value = '';
+            document.getElementById('cbStructurel').checked = false;
+            document.getElementById('cbVisceral').checked = false;
+            document.getElementById('cbCranien').checked = false;
+            document.getElementById('cbFascial').checked = false;
+        }
+        
+        function updateHomeRecent() {
+            const container = document.getElementById('recentBilansHome');
+            if (bilans.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><h3>Aucun bilan</h3></div>';
+                return;
+            }
+            let html = '<h2 style="margin-bottom: 20px; font-size: 24px;">Bilans récents</h2>';
+            bilans.slice(0, 3).forEach(b => {
+                const date = new Date(b.dateCreation).toLocaleDateString('fr-FR');
+                const premierePlainte = b.plaintes && b.plaintes[0] ? b.plaintes[0].motif : 'Consultation';
+                html += `<div class="bilan-card" onclick="showDetailScreen(${b.id})">
+                    <h3>${b.nom}</h3>
+                    <div class="bilan-meta">📅 ${date}</div>
+                    <div class="bilan-preview">${premierePlainte}</div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+        
+        function updateBilansList() {
+            const container = document.getElementById('bilansList');
+            if (bilans.length === 0) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">📁</div><h3>Aucun bilan</h3></div>';
+                return;
+            }
+            let html = '';
+            bilans.forEach(b => {
+                const date = new Date(b.dateCreation).toLocaleDateString('fr-FR');
+                const premierePlainte = b.plaintes && b.plaintes[0] ? b.plaintes[0].motif : 'Consultation';
+                html += `<div class="bilan-card">
+                    <h3>${b.nom}</h3>
+                    <div class="bilan-meta">📅 ${date}</div>
+                    <div class="bilan-preview">${premierePlainte}</div>
+                    <button class="btn-small" onclick="showDetailScreen(${b.id})">👁️ Voir</button>
+                    <button class="btn-small" onclick="shareBilan(${b.id})">📤 Partager</button>
+                    <button class="btn-small btn-danger" onclick="deleteBilan(${b.id})">🗑️ Supprimer</button>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+        
+        function updateBilanDetail(id) {
+            const bilan = bilans.find(b => b.id === id);
+            if (!bilan) return;
+            
+            const date = new Date(bilan.dateCreation).toLocaleDateString('fr-FR');
+            let html = `<h2 style="font-size: 32px; margin-bottom: 30px; color: #e94560;">Bilan de ${bilan.nom}</h2>`;
+            
+            // État Civil
+            html += `<div class="detail-section"><h3>État Civil</h3>`;
+            html += `<div class="detail-field"><div class="detail-label">Nom</div><div class="detail-value">${bilan.nom}</div></div>`;
+            html += `<div class="detail-field"><div class="detail-label">Date</div><div class="detail-value">${date}</div></div>`;
+            if (bilan.dateNaissance) html += `<div class="detail-field"><div class="detail-label">Date de naissance</div><div class="detail-value">${bilan.dateNaissance}</div></div>`;
+            if (bilan.profession) html += `<div class="detail-field"><div class="detail-label">Profession</div><div class="detail-value">${bilan.profession}</div></div>`;
+            if (bilan.sport) html += `<div class="detail-field"><div class="detail-label">Sport(s)</div><div class="detail-value">${bilan.sport}</div></div>`;
+            if (bilan.tel) html += `<div class="detail-field"><div class="detail-label">Téléphone</div><div class="detail-value">${bilan.tel}</div></div>`;
+            html += `</div>`;
+            
+            // Histoire personnelle et mode de vie
+            if (bilan.histoirePerso || bilan.ergonomie || bilan.stress || bilan.sourcesStress) {
+                html += `<div class="detail-section"><h3>Histoire Personnelle et Mode de Vie</h3>`;
+                if (bilan.histoirePerso) html += `<div class="detail-field"><div class="detail-label">Environnement</div><div class="detail-value">${bilan.histoirePerso}</div></div>`;
+                if (bilan.ergonomie) html += `<div class="detail-field"><div class="detail-label">Ergonomie</div><div class="detail-value">${bilan.ergonomie}</div></div>`;
+                if (bilan.stress) html += `<div class="detail-field"><div class="detail-label">Niveau de stress</div><div class="detail-value">${bilan.stress}</div></div>`;
+                if (bilan.sourcesStress) html += `<div class="detail-field"><div class="detail-label">Sources de stress</div><div class="detail-value">${bilan.sourcesStress}</div></div>`;
+                html += `</div>`;
+            }
+            
+            // Observation posturale
+            if (bilan.postureGenerale || bilan.troublesStructurels || bilan.marche || bilan.symetries) {
+                html += `<div class="detail-section"><h3>Observation Posturale</h3>`;
+                if (bilan.postureGenerale) html += `<div class="detail-field"><div class="detail-label">Posture générale</div><div class="detail-value">${bilan.postureGenerale}</div></div>`;
+                if (bilan.troublesStructurels) html += `<div class="detail-field"><div class="detail-label">Troubles structurels</div><div class="detail-value">${bilan.troublesStructurels}</div></div>`;
+                if (bilan.marche) html += `<div class="detail-field"><div class="detail-label">Analyse marche</div><div class="detail-value">${bilan.marche}</div></div>`;
+                if (bilan.symetries) html += `<div class="detail-field"><div class="detail-label">Symétries/Asymétries</div><div class="detail-value">${bilan.symetries}</div></div>`;
+                html += `</div>`;
+            }
+            
+            if (bilan.plaintes && bilan.plaintes.length > 0) {
+                html += '<div class="detail-section"><h3>Plaintes / Motifs de Consultation</h3>';
+                bilan.plaintes.forEach((p, i) => {
+                    html += `<div class="plainte-detail">`;
+                    html += `<strong>${i === 0 ? 'Plainte Principale' : 'Plainte Secondaire #' + i}: ${p.motif}</strong>`;
+                    html += `<div style="color: #e94560; margin: 6px 0;">⚡ Douleur: ${p.eva}/10</div>`;
+                    
+                    // Affichage détaillé pour la première plainte (HDM)
+                    if (i === 0) {
+                        if (p.dateApparition) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 8px;"><strong>Date d'apparition:</strong> ${p.dateApparition}</div>`;
+                        if (p.circonstances) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Circonstances:</strong> ${p.circonstances}</div>`;
+                        if (p.evolution) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Évolution:</strong> ${p.evolution}</div>`;
+                        if (p.aggravants) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Facteurs aggravants:</strong> ${p.aggravants}</div>`;
+                        if (p.ameliorants) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Facteurs améliorants:</strong> ${p.ameliorants}</div>`;
+                        if (p.localisation) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Localisation:</strong> ${p.localisation}</div>`;
+                        
+                        // Type de douleur
+                        if (p.typeDouleur) {
+                            let types = [];
+                            if (p.typeDouleur.mecanique) types.push('Mécanique');
+                            if (p.typeDouleur.inflammatoire) types.push('Inflammatoire');
+                            if (p.typeDouleur.mixte) types.push('Mixte');
+                            if (p.typeDouleur.aigue) types.push('Aiguë');
+                            if (p.typeDouleur.chronique) types.push('Chronique');
+                            if (types.length > 0) {
+                                html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Type:</strong> ${types.join(', ')}</div>`;
+                            }
+                        }
+                        
+                        if (p.examens) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Examens:</strong> ${p.examens}</div>`;
+                        if (p.traitementsAnterieurs) html += `<div style="color: #b8c1ec; font-size: 13px; margin-top: 4px;"><strong>Traitements antérieurs:</strong> ${p.traitementsAnterieurs}</div>`;
+                    } else {
+                        // Affichage simple pour les plaintes secondaires
+                        if (p.circonstances) html += `<div style="color: #b8c1ec; font-size: 14px; margin-top: 6px;">${p.circonstances}</div>`;
+                    }
+                    
+                    html += `</div>`;
+                });
+                html += '</div>';
+            }
+            
+            // Antécédents
+            if (bilan.pathologies || bilan.traumatiques || bilan.chirurgicaux || bilan.medicaments) {
+                html += `<div class="detail-section"><h3>Antécédents</h3>`;
+                if (bilan.pathologies) html += `<div class="detail-field"><div class="detail-label">Pathologies connues</div><div class="detail-value">${bilan.pathologies}</div></div>`;
+                if (bilan.traumatiques) html += `<div class="detail-field"><div class="detail-label">Traumatiques</div><div class="detail-value">${bilan.traumatiques}</div></div>`;
+                if (bilan.chirurgicaux) html += `<div class="detail-field"><div class="detail-label">Chirurgicaux</div><div class="detail-value">${bilan.chirurgicaux}</div></div>`;
+                if (bilan.medicaments) html += `<div class="detail-field"><div class="detail-label">Médicaments en cours</div><div class="detail-value">${bilan.medicaments}</div></div>`;
+                html += `</div>`;
+            }
+            
+            // Plaintes par systèmes
+            if (bilan.systemeCephalique || bilan.systemeCardio || bilan.systemeRespiratoire || bilan.systemeDigestif || 
+                bilan.systemeTransit || bilan.systemeUro || bilan.systemeGyneco || bilan.systemeSommeil || 
+                bilan.systemePsycho || bilan.systemeNeuro || bilan.systemeVasculaire || bilan.systemeAutres) {
+                html += `<div class="detail-section"><h3>Plaintes par Systèmes</h3>`;
+                if (bilan.systemeCephalique) html += `<div class="detail-field"><div class="detail-label">🧠 Sphère Céphalique et ORL</div><div class="detail-value">${bilan.systemeCephalique}</div></div>`;
+                if (bilan.systemeCardio) html += `<div class="detail-field"><div class="detail-label">❤️ Système Cardio-Vasculaire</div><div class="detail-value">${bilan.systemeCardio}</div></div>`;
+                if (bilan.systemeRespiratoire) html += `<div class="detail-field"><div class="detail-label">🫁 Système Respiratoire</div><div class="detail-value">${bilan.systemeRespiratoire}</div></div>`;
+                if (bilan.systemeDigestif) html += `<div class="detail-field"><div class="detail-label">🍽️ Système Digestif</div><div class="detail-value">${bilan.systemeDigestif}</div></div>`;
+                if (bilan.systemeTransit) html += `<div class="detail-field"><div class="detail-label">💩 Transit Intestinal</div><div class="detail-value">${bilan.systemeTransit}</div></div>`;
+                if (bilan.systemeUro) html += `<div class="detail-field"><div class="detail-label">🩺 Système Uro-Génital</div><div class="detail-value">${bilan.systemeUro}</div></div>`;
+                if (bilan.systemeGyneco) html += `<div class="detail-field"><div class="detail-label">🌸 Sphère Gynécologique</div><div class="detail-value">${bilan.systemeGyneco}</div></div>`;
+                if (bilan.systemeSommeil) html += `<div class="detail-field"><div class="detail-label">😴 Troubles du Sommeil</div><div class="detail-value">${bilan.systemeSommeil}</div></div>`;
+                if (bilan.systemePsycho) html += `<div class="detail-field"><div class="detail-label">🧘 Troubles Psycho-Émotionnels</div><div class="detail-value">${bilan.systemePsycho}</div></div>`;
+                if (bilan.systemeNeuro) html += `<div class="detail-field"><div class="detail-label">⚡ Troubles Neurologiques</div><div class="detail-value">${bilan.systemeNeuro}</div></div>`;
+                if (bilan.systemeVasculaire) html += `<div class="detail-field"><div class="detail-label">🩸 Troubles Vasculaires et Lymphatiques</div><div class="detail-value">${bilan.systemeVasculaire}</div></div>`;
+                if (bilan.systemeAutres) html += `<div class="detail-field"><div class="detail-label">🌡️ Autres Troubles</div><div class="detail-value">${bilan.systemeAutres}</div></div>`;
+                html += `</div>`;
+            }
+            
+            if (bilan.bilanOsteo) {
+                html += '<div class="detail-section"><h3>Bilan Ostéo-Articulaire</h3>';
+                
+                // Définir les régions
+                const regions = [
+                    {nom: 'Pieds', mobilite: 'mobilitePieds', lesions: 'lesionsPieds'},
+                    {nom: 'Chevilles', mobilite: 'mobiliteChevilles', lesions: 'lesionsChevilles'},
+                    {nom: 'Genoux', mobilite: 'mobiliteGenoux', lesions: 'lesionsGenoux'},
+                    {nom: 'Hanches', mobilite: 'mobiliteHanches', lesions: 'lesionsHanches'},
+                    {nom: 'Bassin', mobilite: 'mobiliteBassin', lesions: 'lesionsBassin'},
+                    {nom: 'Lombaires', mobilite: 'mobiliteLombaires', lesions: 'lesionsLombaires'},
+                    {nom: 'Dorsales', mobilite: 'mobiliteDorsales', lesions: 'lesionsDorsales'},
+                    {nom: 'Cervicales', mobilite: 'mobiliteCervicales', lesions: 'lesionsCervicales'},
+                    {nom: 'Mains', mobilite: 'mobiliteMains', lesions: 'lesionsMains'},
+                    {nom: 'Poignets', mobilite: 'mobilitePoignets', lesions: 'lesionsPoignets'},
+                    {nom: 'Coudes', mobilite: 'mobiliteCoudes', lesions: 'lesionsCoudes'},
+                    {nom: 'Épaules', mobilite: 'mobiliteEpaules', lesions: 'lesionsEpaules'},
+                    {nom: 'Crâne', mobilite: 'mobiliteCrane', lesions: 'lesionsCrane'},
+                    {nom: 'Thorax', mobilite: 'mobiliteThorax', lesions: 'lesionsThorax'},
+                    {nom: 'Abdomen', mobilite: 'mobiliteAbdomen', lesions: 'lesionsAbdomen'}
+                ];
+                
+                regions.forEach(region => {
+                    const mob = bilan.bilanOsteo[region.mobilite];
+                    const les = bilan.bilanOsteo[region.lesions];
+                    
+                    if (mob || les) {
+                        html += `<div style="background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; margin-bottom: 10px;">`;
+                        html += `<strong style="color: #e94560; display: block; margin-bottom: 8px;">${region.nom}</strong>`;
+                        
+                        if (mob) {
+                            html += `<div style="margin-bottom: 6px;"><span style="color: #06d6a0; font-size: 12px; font-weight: 600;">🟢 MOBILITÉ:</span> <span style="color: #b8c1ec;">${mob}</span></div>`;
+                        }
+                        
+                        if (les) {
+                            html += `<div><span style="color: #e94560; font-size: 12px; font-weight: 600;">🔴 LÉSIONS:</span> <span style="color: #b8c1ec;">${les}</span></div>`;
+                        }
+                        
+                        html += `</div>`;
+                    }
+                });
+                
+                html += '</div>';
+            }
+            
+            if (bilan.traitements && bilan.traitements.length > 0) {
+                html += '<div class="detail-section"><h3>Traitements</h3>';
+                bilan.traitements.forEach(t => {
+                    const dateT = new Date(t.date).toLocaleDateString('fr-FR');
+                    html += `<div class="traitement-item"><div class="traitement-date">${dateT}</div><div class="traitement-content">${t.description}</div></div>`;
+                });
+                html += '</div>';
+            }
+            
+            document.getElementById('bilanDetailContent').innerHTML = html;
+        }
+        
+        function shareBilan(id) {
+            const bilan = bilans.find(b => b.id === id);
+            if (!bilan) return;
+            let text = `📋 BILAN: ${bilan.nom}\n📅 ${new Date(bilan.dateCreation).toLocaleDateString('fr-FR')}`;
+            
+            if (navigator.share) {
+                navigator.share({ title: 'Bilan', text: text }).catch(() => {});
+            } else {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                alert('✅ Copié !');
+            }
+        }
+        
+        function deleteBilan(id) {
+            if (confirm('⚠️ Supprimer ce bilan ?')) {
+                bilans = bilans.filter(b => b.id !== id);
+                saveToStorage();
+                updateBilansList();
+                alert('✅ Supprimé');
+            }
+        }
+        
+        function showStatsAlert() {
+            if (bilans.length === 0) {
+                alert('📊 Aucune statistique');
+                return;
+            }
+            alert(`📊 STATISTIQUES\n\n📋 Total: ${bilans.length} bilan(s)`);
+        }
+        
+        function exportAllBilans() {
+            if (bilans.length === 0) {
+                alert('Aucune donnée');
+                return;
+            }
+            const dataStr = JSON.stringify(bilans, null, 2);
+            const dataBlob = new Blob([dataStr], {type: 'application/json'});
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'osteopro_bilans_' + new Date().toISOString().split('T')[0] + '.json';
+            link.click();
+            URL.revokeObjectURL(url);
+            alert(`✅ ${bilans.length} bilan(s) exporté(s) !`);
+        }
+        
+        init();
+    </script>
+</body>
+</html>
